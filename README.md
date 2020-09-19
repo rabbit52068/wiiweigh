@@ -59,6 +59,7 @@ sudo bluetoothctl
 
 The following procedure should only be required once, the sync survives host reboots. Just try if after the disconnect command you can connect by simply pushing the front button of the board, if not, delete the pairing and try again. The hid_wiimote module lights the blue led of the button when loaded, when it's not the led keeps blinking.
 
+## pair Wiiboard
 Start `bluetoothctl`
 
 ```
@@ -84,3 +85,35 @@ Manual disconnect (if needed during tests) with
 echo "disconnect <MAC of the wiimote>" | bluetoothctl
 ```
 This might throw warnings, but works. Alternatively remove the batteries.
+
+
+## usage
+After pairing the wiiboard, run
+```
+python ~/src/wiiweigh/wiiweigh.py
+```
+Press wiibord power to connect, if the blue light stays lit, that means the board is connected.
+```
+{Device1.PropertyChanged} [/org/bluez/hci0/dev_<MAC of the wiimote>] Connected = 1
+```
+Stand on the board and wait for output.
+```
+67.02 +/- 0.30
+```
+The blue light will also go off and disconnect.
+```
+{Device1.PropertyChanged} [/org/bluez/hci0/dev_<MAC of the wiimote>] Connected = 0
+```
+Press power again to repeat the process.
+
+
+## error
+If you encountered
+```
+ImportError: /usr/lib/arm-linux-gnueabihf/libxwiimote.so.2: version `LIBXWIIMOTE_3' not found (required by /usr/local/lib/python2.7/dist-packages/_xwiimote.so)
+```
+Add ```export LD_LIBRARY_PATH=/usr/local/lib``` to the last line of the .profile ```sudo nano .profile```
+
+Run ```env | grep '^LD_LIBRARY_PATH'```,
+it should output
+```LD_LIBRARY_PATH=/usr/local/lib``` 
