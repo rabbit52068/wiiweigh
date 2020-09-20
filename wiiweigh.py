@@ -11,6 +11,18 @@ import xwiimote
 import fnmatch
 import os
 
+# weight adjust
+calibration = 3.33
+
+# add pahoMQTT
+import paho.mqtt.client as mqtt
+broker_address="192.168.1.2"
+print("connecting to MQTT broker...")
+client = mqtt.Client("unique_clientid") #create new instance
+client.username_pw_set("mqtt_username", "password") #login detail, comment out if no use
+client.connect(broker_address, 1883) #connect to broker
+print("connected.")
+
 import bluezutils
 
 import dbus
@@ -150,7 +162,9 @@ def connect_balanceboard():
 	# do something with this data
 	# like log to file or send to server
 	#
-	print("{:.2f} +/- {:.2f}".format(kg/100.0, err/100.0))
+	print("{:.2f} +/- {:.2f}".format(kg/100.0 + calibration, err/100.0)) #add adjustment to final result
+	print("publish to MQTT")
+        client.publish("mqtt/topic", "{:.2f}".format(kg/100.0 + calibration), retain=True) #publish to topic
 
 	# find address of the balance board (once) and disconnect (if found).
 	if bbaddress is None:
